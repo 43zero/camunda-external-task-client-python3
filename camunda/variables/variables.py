@@ -25,10 +25,21 @@ class Variables:
         """
         formatted_vars = {}
         if variables:
-            formatted_vars = {
-                k: v if (isinstance(v, dict) and "value" in v.keys()) else {"value": v}
-                for k, v in variables.items()
-            }
+            for i in variables.keys():
+                 if type(variables[i]) in [bool, int, float, str]:
+                     formatted_vars[i] = {"value": variables[i]}
+                 elif type(variables[i]) == dict and "value" in variables[i] and type(variables[i]['value']) in [bool, int, float, str]:
+                     formatted_vars[i] = variables[i]
+                 elif type(variables[i]) == list:
+                     formatted_vars[i] = {"value": json.dumps(variables[i]), #r'[\"{}\"]'.format(r'\",\"'.join(variables[i]))
+                                          "type": "object",
+                                          "valueInfo": { 
+                                            "objectTypeName": "java.util.ArrayList", 
+                                            "serializationDataFormat": "application/json"
+                                          }
+                                         }
+                 else:
+                     formatted_vars[i] = {"value": json.dumps(variables[i]), "type": "json"}
         return formatted_vars
 
     def to_dict(self):
